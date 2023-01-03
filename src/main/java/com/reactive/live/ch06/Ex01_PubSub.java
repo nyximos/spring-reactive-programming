@@ -6,6 +6,7 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -29,7 +30,8 @@ public class Ex01_PubSub {
 
     public static void main(String[] args) {
         Publisher<Integer> pub = iterPub(Stream.iterate(1, a -> a + 1).limit(10).collect(Collectors.toList()));
-        Publisher<Integer> mapPub = mapPub(pub, s -> s * 10);
+        Publisher<String> mapPub = mapPub(pub, s -> "["+ s +"]");
+//        Publisher<List> mapPub = mapPub(pub, s -> Collections.singletonList(s));
 //        Publisher<Integer> mapPub2 = mapPub(mapPub, s -> -s);
 //        Publisher<Integer> sumPub = sumPup(pub);
 //        Publisher<Integer> reducePub = reducePub(pub, 0, (BiFunction<Integer, Integer, Integer>)(a, b) -> a+b);

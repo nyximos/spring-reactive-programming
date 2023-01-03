@@ -1,5 +1,7 @@
 package com.reactive.live.ch06;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -26,9 +28,32 @@ public class Ex01_PubSub {
 
     public static void main(String[] args) {
         Publisher<Integer> pub = iterPub(Stream.iterate(1, a -> a + 1).limit(10).collect(Collectors.toList()));
-        Publisher<Integer> mapPub = mapPub(pub, s -> s * 10);
-        Publisher<Integer> mapPub2 = mapPub(mapPub, s -> -s);
-        mapPub2.subscribe(logSub());
+//        Publisher<Integer> mapPub = mapPub(pub, s -> s * 10);
+//        Publisher<Integer> mapPub2 = mapPub(mapPub, s -> -s);
+        Publisher<Integer> sumPub = sumPup(pub);
+        sumPub.subscribe(logSub());
+    }
+
+    private static Publisher<Integer> sumPup(Publisher<Integer> pub) {
+        return new Publisher<Integer>() {
+            @Override
+            public void subscribe(Subscriber<? super Integer> sub) {
+                pub.subscribe(new DelegateSub(sub){
+                    int sum = 0;
+
+                    @Override
+                    public void onNext(Integer i) {
+                        sum += i;
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onNext(sum);
+                        sub.onComplete();
+                    }
+                });
+            }
+        };
     }
 
     private static Publisher<Integer> mapPub(Publisher<Integer> pub, Function<Integer, Integer> f) {

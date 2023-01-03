@@ -35,19 +35,19 @@ public class Ex01_PubSub {
 //        Publisher<Integer> mapPub2 = mapPub(mapPub, s -> -s);
 //        Publisher<Integer> sumPub = sumPup(pub);
 //        Publisher<Integer> reducePub = reducePub(pub, 0, (BiFunction<Integer, Integer, Integer>)(a, b) -> a+b);
-        Publisher<String> reducePub = reducePub(pub, "", (a, b) -> a + "-" + b);
+        Publisher<StringBuilder> reducePub = reducePub(pub, new StringBuilder(), (a, b) -> a.append(b + ","));
         reducePub.subscribe(logSub());
     }
 
-    private static Publisher<String> reducePub(Publisher<Integer> pub, String init, BiFunction<String, Integer, String> bf) {
-        return new Publisher<String>() {
+    private static <T,R> Publisher<R> reducePub(Publisher<T> pub, R init, BiFunction<R, T, R> bf) {
+        return new Publisher<R>() {
             @Override
-            public void subscribe(Subscriber<? super String> sub) {
-                pub.subscribe(new DelegateSub<Integer, String>(sub){
-                    String result = init;
+            public void subscribe(Subscriber<? super R> sub) {
+                pub.subscribe(new DelegateSub<T, R>(sub){
+                    R result = init;
 
                     @Override
-                    public void onNext(Integer i) {
+                    public void onNext(T i) {
                         result = bf.apply(result, i);
                     }
 

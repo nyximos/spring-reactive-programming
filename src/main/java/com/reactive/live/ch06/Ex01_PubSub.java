@@ -30,21 +30,21 @@ public class Ex01_PubSub {
 
     public static void main(String[] args) {
         Publisher<Integer> pub = iterPub(Stream.iterate(1, a -> a + 1).limit(10).collect(Collectors.toList()));
-        Publisher<String> mapPub = mapPub(pub, s -> "["+ s +"]");
+//        Publisher<String> mapPub = mapPub(pub, s -> "["+ s +"]");
 //        Publisher<List> mapPub = mapPub(pub, s -> Collections.singletonList(s));
 //        Publisher<Integer> mapPub2 = mapPub(mapPub, s -> -s);
 //        Publisher<Integer> sumPub = sumPup(pub);
 //        Publisher<Integer> reducePub = reducePub(pub, 0, (BiFunction<Integer, Integer, Integer>)(a, b) -> a+b);
-        mapPub.subscribe(logSub());
+        Publisher<String> reducePub = reducePub(pub, "", (a, b) -> a + "-" + b);
+        reducePub.subscribe(logSub());
     }
 
-    /*
-    private static Publisher<Integer> reducePub(Publisher<Integer> pub, int init, BiFunction<Integer, Integer, Integer> bf) {
-        return new Publisher<Integer>() {
+    private static Publisher<String> reducePub(Publisher<Integer> pub, String init, BiFunction<String, Integer, String> bf) {
+        return new Publisher<String>() {
             @Override
-            public void subscribe(Subscriber<? super Integer> sub) {
-                pub.subscribe(new DelegateSub(sub){
-                    int result = 0;
+            public void subscribe(Subscriber<? super String> sub) {
+                pub.subscribe(new DelegateSub<Integer, String>(sub){
+                    String result = init;
 
                     @Override
                     public void onNext(Integer i) {
@@ -61,6 +61,7 @@ public class Ex01_PubSub {
         };
     }
 
+    /*
     private static Publisher<Integer> sumPup(Publisher<Integer> pub) {
         return new Publisher<Integer>() {
             @Override

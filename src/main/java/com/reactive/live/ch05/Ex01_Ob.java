@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Iterator;
 
 @Slf4j
-public class Ob {
+public class Ex01_Ob {
     public static void main(String[] args) {
 
         Iterable<Integer> iter = () ->

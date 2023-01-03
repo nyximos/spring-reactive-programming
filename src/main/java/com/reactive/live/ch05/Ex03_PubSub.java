@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.Flow;
 
 import static java.util.concurrent.Flow.Publisher;
 import static java.util.concurrent.Flow.Subscriber;
@@ -23,19 +24,24 @@ public class Ex03_PubSub {
 
         Publisher p = new Publisher() {
             @Override
-            public void subscribe(Subscriber subscriber) {
+            public void subscribe(Flow.Subscriber subscriber) {
                 Iterator<Integer> it = iter.iterator();
 
                 subscriber.onSubscribe(new Subscription() {
                     @Override
                     public void request(long n) {
-                        while (n-- > 0) {
-                            if (it.hasNext()) {
-                                subscriber.onNext(it.next());
-                            } else {
-                                subscriber.onComplete();
-                                break;
+                        try {
+                            while(n-- > 0) {
+                                if(it.hasNext()) {
+                                    subscriber.onNext(it.next());
+                                }
+                                else {
+                                    subscriber.onComplete();
+                                    break;
+                                }
                             }
+                        } catch (RuntimeException e) {
+                            subscriber.onError(e);
                         }
                     }
 

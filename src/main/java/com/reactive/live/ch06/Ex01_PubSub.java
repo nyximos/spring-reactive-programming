@@ -26,8 +26,8 @@ public class Ex01_PubSub {
 
     public static void main(String[] args) {
         Publisher<Integer> pub = iterPub(Stream.iterate(1, a -> a + 1).limit(10).collect(Collectors.toList()));
-        Publisher<Integer> mapPub = mapPub(pub, (Function<Integer, Integer>) s -> s * 10);
-        Publisher<Integer> mapPub2 = mapPub(mapPub, (Function<Integer, Integer>) s -> -s);
+        Publisher<Integer> mapPub = mapPub(pub, s -> s * 10);
+        Publisher<Integer> mapPub2 = mapPub(mapPub, s -> -s);
         mapPub2.subscribe(logSub());
     }
 
@@ -35,25 +35,10 @@ public class Ex01_PubSub {
         return new Publisher<Integer>() {
             @Override
             public void subscribe(Subscriber<? super Integer> sub) {
-                pub.subscribe(new Subscriber<Integer>() {
-                    @Override
-                    public void onSubscribe(Subscription s) {
-                        sub.onSubscribe(s);
-                    }
-
+                pub.subscribe(new DelegateSub(sub){
                     @Override
                     public void onNext(Integer i) {
-                        sub.onNext(f.apply(i));
-                    }
-
-                    @Override
-                    public void onError(Throwable t) {
-                        sub.onError(t);
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        sub.onComplete();
+                        super.onNext(f.apply(i));
                     }
                 });
             }

@@ -26,7 +26,6 @@ public class Ex03_PubSub {
         ExecutorService es = Executors.newCachedThreadPool();
 
         Publisher p = new Publisher() {
-
             @Override
             public void subscribe(Subscriber subscriber) {
                 Iterator<Integer> it = iter.iterator();
@@ -59,7 +58,7 @@ public class Ex03_PubSub {
             Subscription subscription;
             @Override
             public void onSubscribe(Subscription subscription) {
-                System.out.println("onSubscribe");
+                System.out.println(Thread.currentThread().getName() + " onSubscribe");
                 //subscription.request(Long.MAX_VALUE);
                 this.subscription = subscription;
                 this.subscription.request(1);
